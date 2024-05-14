@@ -32,10 +32,11 @@ def index():
     if request.method == 'POST':
         file = request.files['file']
         if file and file.filename != '':
-            file_path = os.path.join('/tmp/uploads', file.filename)
+            filename = file.filename.replace(' ', '_')
+            file_path = os.path.join('/tmp/uploads', filename)
             file.save(file_path)
             upload_time = datetime.now().strftime('%Y-%m-%d %H:%M:%S')
-            save_upload_details(file.filename, upload_time)
+            save_upload_details(filename, upload_time)
             session['file_path'] = file_path
             session['upload_time'] = upload_time
             return redirect(url_for('view_data'))
@@ -64,7 +65,6 @@ def all_variants_detail():
         file_data = pd.read_csv(session['file_path'])
         all_data = file_data[['Surname', 'First Name/Nickname', 'Email', 'Variant', 'Company/University:']]
         return render_template('all_variants_detail.html', all_data=all_data)
-    return redirect(url_for('index'))
 
 @app.route('/delete/<filename>')
 def delete_file(filename):
@@ -83,7 +83,6 @@ def delete_file(filename):
         return redirect(url_for('index'))
     else:
         return jsonify({'error': 'File not found'}), 404
-
 
 if __name__ == '__main__':
     app.run(debug=True)
