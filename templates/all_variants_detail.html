@@ -1,0 +1,27 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>All Variants Detail</title>
+</head>
+<body>
+    <h1>All Variants</h1>
+    <table border="1">
+        <tr>
+            <th>Surname</th>
+            <th>First Name/Nickname</th>
+            <th>Email</th>
+            <th>Variant</th>
+            <th>Company/University</th>
+        </tr>
+        {% for index, row in all_data.iterrows() %}
+        <tr>
+            <td>{{ row['Surname'] }}</td>
+            <td>{{ row['First Name/Nickname'] }}</td>
+            <td>{{ row['Email'] }}</td>
+            <td>{{ row['Variant'] }}</td>
+            <td>{{ row['Company/University:'] }}</td>
+        </tr>
+        {% endfor %}
+    </table>
+</body>
+</html>

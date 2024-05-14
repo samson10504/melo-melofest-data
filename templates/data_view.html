@@ -1,0 +1,15 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Data View</title>
+</head>
+<body>
+    <h1>Variant Overview</h1>
+    <p>Uploaded on: {{ upload_time }}</p>
+    <!-- Make total variants count clickable -->
+    <p><a href="{{ url_for('all_variants_detail') }}">Total Variants Count: {{ total_variants }}</a></p>
+    {% for variant, count in variants.items() %}
+        <p><a href="{{ url_for('variant_detail', variant_name=variant) }}">{{ variant }}: {{ count }}</a></p>
+    {% endfor %}
+</body>
+</html>
