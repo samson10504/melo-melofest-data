@@ -2,6 +2,15 @@
 <html>
 <head>
     <title>Upload File</title>
+    <script>
+        function confirmDelete(fileName) {
+            if (confirm('Are you sure you want to delete this file? This action cannot be undone.')) {
+                if (confirm('Please confirm again to delete this file.')) {
+                    window.location.href = '/delete/' + fileName;
+                }
+            }
+        }
+    </script>
 </head>
 <body>
     <h1>Upload your CSV File</h1>
@@ -13,7 +22,7 @@
     <h2>Previous Uploads</h2>
     <ul>
         {% for file_name, upload_time in files_info.items() %}
-            <li>{{ file_name }} (uploaded on {{ upload_time }}) - <a href="{{ url_for('view_data', file_name=file_name) }}">View</a></li>
+            <li>{{ file_name }} (uploaded on {{ upload_time }}) - <a href="#" onclick="confirmDelete('{{ file_name }}')">Delete</a> - <a href="{{ url_for('view_data', file_name=file_name) }}">View</a></li>
         {% endfor %}
     </ul>
 </body>

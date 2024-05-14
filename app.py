@@ -1,4 +1,4 @@
-from flask import Flask, request, render_template, redirect, url_for, session
+from flask import Flask, request, render_template, redirect, url_for, session, jsonify, make_response
 import pandas as pd
 import os
 import json
@@ -65,6 +65,25 @@ def all_variants_detail():
         all_data = file_data[['Surname', 'First Name/Nickname', 'Email', 'Variant', 'Company/University:']]
         return render_template('all_variants_detail.html', all_data=all_data)
     return redirect(url_for('index'))
+
+@app.route('/delete/<filename>')
+def delete_file(filename):
+    file_path = os.path.join('uploads', filename)
+    if os.path.exists(file_path):
+        os.remove(file_path)
+        # Update JSON
+        with open('uploads/uploads.json', 'r+') as f:
+            data = json.load(f)
+            # Remove the entry for the deleted file
+            if filename in data:
+                del data[filename]
+                f.seek(0)  # Reset file position to the beginning of the file
+                json.dump(data, f, indent=4)  # Write the updated JSON data
+                f.truncate()  # Remove any trailing data that is no longer part of the JSON
+        return redirect(url_for('index'))
+    else:
+        return jsonify({'error': 'File not found'}), 404
+
 
 if __name__ == '__main__':
     app.run(debug=True)
