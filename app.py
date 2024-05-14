@@ -8,11 +8,11 @@ app = Flask(__name__)
 app.config['SECRET_KEY'] = 'your_secret_key'  # Replace 'your_secret_key' with a real secret key
 
 # Ensure the uploads directory exists
-os.makedirs('tmp/uploads', exist_ok=True)
+os.makedirs('/tmp/uploads', exist_ok=True)
 
 def save_upload_details(file_name, upload_time):
     data = {}
-    file_path = 'tmp/uploads/uploads.json'
+    file_path = '/tmp/uploads/uploads.json'
     if os.path.exists(file_path):
         with open(file_path, 'r') as f:
             data = json.load(f)
@@ -24,7 +24,7 @@ def save_upload_details(file_name, upload_time):
 def index():
     files_info = {}
     try:
-        with open('tmp/uploads/uploads.json', 'r') as f:
+        with open('/tmp/uploads/uploads.json', 'r') as f:
             files_info = json.load(f)
     except FileNotFoundError:
         pass  # No uploads.json file yet
@@ -32,7 +32,7 @@ def index():
     if request.method == 'POST':
         file = request.files['file']
         if file and file.filename != '':
-            file_path = os.path.join('tmp/uploads', file.filename)
+            file_path = os.path.join('/tmp/uploads', file.filename)
             file.save(file_path)
             upload_time = datetime.now().strftime('%Y-%m-%d %H:%M:%S')
             save_upload_details(file.filename, upload_time)
@@ -68,11 +68,11 @@ def all_variants_detail():
 
 @app.route('/delete/<filename>')
 def delete_file(filename):
-    file_path = os.path.join('tmp/uploads', filename)
+    file_path = os.path.join('/tmp/uploads', filename)
     if os.path.exists(file_path):
         os.remove(file_path)
         # Update JSON
-        with open('tmp/uploads/uploads.json', 'r+') as f:
+        with open('/tmp/uploads/uploads.json', 'r+') as f:
             data = json.load(f)
             # Remove the entry for the deleted file
             if filename in data:
