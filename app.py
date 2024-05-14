@@ -3,6 +3,7 @@ import pandas as pd
 import os
 import json
 from datetime import datetime
+import urllib.parse  # Import the parse module
 
 app = Flask(__name__)
 app.config['SECRET_KEY'] = 'your_secret_key'  # Replace 'your_secret_key' with a real secret key
@@ -51,13 +52,15 @@ def view_data():
         return render_template('data_view.html', variants=variants, total_variants=total_variants, upload_time=session['upload_time'])
     return redirect(url_for('index'))
 
-@app.route('/variant/<variant_name>', methods=['GET'])
+@app.route('/variant/<path:variant_name>', methods=['GET'])
 def variant_detail(variant_name):
+    variant_name = urllib.parse.unquote(variant_name)  # Decode the variant name
     if 'file_path' in session:
         file_data = pd.read_csv(session['file_path'])
         variant_data = file_data[file_data['Variant'] == variant_name][['Surname', 'First Name/Nickname', 'Email', 'Variant', 'Company/University:']]
         return render_template('variant_detail.html', variant_data=variant_data, variant_name=variant_name)
     return redirect(url_for('index'))
+
 
 @app.route('/all_variants', methods=['GET'])
 def all_variants_detail():
