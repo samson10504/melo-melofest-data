@@ -1,0 +1,25 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Referral Details</title>
+</head>
+<body>
+    <h1>Referral Details</h1>
+    <table border="1">
+        <tr>
+            <th>Referee</th>
+            <th>Count</th>
+            <th>Referred By</th>
+            <th>Status</th>
+        </tr>
+        {% for index, row in referral_counts.iterrows() %}
+        <tr>
+            <td>{{ row['Referee'] }}</td>
+            <td>{{ row['Count'] }}</td>
+            <td>{{ row['Referred By'] }}</td>
+            <td>{{ row['Status'] }}</td>
+        </tr>
+        {% endfor %}
+    </table>
+</body>
+</html>

@@ -1,9 +1,11 @@
-from flask import Flask, request, render_template, redirect, url_for, session, jsonify, make_response
-import pandas as pd
-import os
 import json
-from datetime import datetime
+import os
 import urllib.parse  # Import the parse module
+from datetime import datetime
+
+import pandas as pd
+from flask import (Flask, jsonify, make_response, redirect, render_template,
+                   request, session, url_for)
 
 app = Flask(__name__)
 app.config['SECRET_KEY'] = 'your_secret_key'  # Replace 'your_secret_key' with a real secret key
@@ -47,8 +49,10 @@ def index():
 def view_data():
     if 'file_path' in session:
         file_data = pd.read_csv(session['file_path'])
-        variants = file_data['Variant'].value_counts()
-        total_variants = file_data['Variant'].count()
+        # Filter data where status is not "Voided"
+        filtered_data = file_data[file_data['Status'] != 'Voided']
+        variants = filtered_data['Variant'].value_counts()
+        total_variants = filtered_data['Variant'].count()
         return render_template('data_view.html', variants=variants, total_variants=total_variants, upload_time=session['upload_time'])
     return redirect(url_for('index'))
 
@@ -57,7 +61,9 @@ def variant_detail(variant_name):
     variant_name = urllib.parse.unquote(variant_name)  # Decode the variant name
     if 'file_path' in session:
         file_data = pd.read_csv(session['file_path'])
-        variant_data = file_data[file_data['Variant'] == variant_name][['Surname', 'First Name/Nickname', 'Email', 'Variant', 'Company/University:']]
+        # Filter data where status is not "Voided"
+        filtered_data = file_data[file_data['Status'] != 'Voided']
+        variant_data = filtered_data[filtered_data['Variant'] == variant_name][['Surname', 'First Name/Nickname', 'Email', 'Variant', 'Company/University:', 'Who Referred You? (if any)','Status']]
         return render_template('variant_detail.html', variant_data=variant_data, variant_name=variant_name)
     return redirect(url_for('index'))
 
@@ -66,7 +72,9 @@ def variant_detail(variant_name):
 def all_variants_detail():
     if 'file_path' in session:
         file_data = pd.read_csv(session['file_path'])
-        all_data = file_data[['Surname', 'First Name/Nickname', 'Email', 'Variant', 'Company/University:']]
+        # Filter data where status is not "Voided"
+        filtered_data = file_data[file_data['Status'] != 'Voided']
+        all_data = filtered_data[['Surname', 'First Name/Nickname', 'Email', 'Variant', 'Company/University:', 'Who Referred You? (if any)','Status']]
         return render_template('all_variants_detail.html', all_data=all_data)
 
 @app.route('/delete/<filename>')
@@ -86,6 +94,20 @@ def delete_file(filename):
         return redirect(url_for('index'))
     else:
         return jsonify({'error': 'File not found'}), 404
+
+@app.route('/referral_details', methods=['GET'])
+def referral_details():
+    if 'file_path' in session:
+        file_data = pd.read_csv(session['file_path'])
+        referral_data = file_data[['First Name/Nickname', 'Surname', 'Who Referred You? (if any)','Status']].dropna(subset=['Who Referred You? (if any)'])
+        referral_data['Full Name'] = referral_data['First Name/Nickname'] + ' ' + referral_data['Surname']
+        referral_counts = referral_data.groupby('Who Referred You? (if any)').agg({
+            'Full Name': ['count', lambda x: ', '.join(x)]
+        }).reset_index()
+        referral_counts.columns = ['Referee', 'Count', 'Referred By','Status']
+        return render_template('referral_details.html', referral_counts=referral_counts)
+    return redirect(url_for('index'))
+
 
 if __name__ == '__main__':
     app.run(debug=True)

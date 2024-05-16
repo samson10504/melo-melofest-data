@@ -12,6 +12,8 @@
             <th>Email</th>
             <th>Variant</th>
             <th>Company/University</th>
+            <th>Who Referred You? (if any)</th>
+            <th>Status</th>
         </tr>
         {% for index, row in variant_data.iterrows() %}
         <tr>
@@ -20,6 +22,8 @@
             <td>{{ row['Email'] }}</td>
             <td>{{ row['Variant'] }}</td>
             <td>{{ row['Company/University:'] }}</td>
+            <td>{{ row['Who Referred You? (if any)'] }}</td>
+            <td>{{ row['Status'] }}</td>
         </tr>
         {% endfor %}
     </table>
