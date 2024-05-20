@@ -100,13 +100,23 @@ def referral_details():
     if 'file_path' in session:
         file_data = pd.read_csv(session['file_path'])
         referral_data = file_data[['First Name/Nickname', 'Surname', 'Who Referred You? (if any)','Status']].dropna(subset=['Who Referred You? (if any)'])
+        
+        # Handle missing values when concatenating names
+        referral_data['First Name/Nickname'] = referral_data['First Name/Nickname'].fillna('')
+        referral_data['Surname'] = referral_data['Surname'].fillna('')
         referral_data['Full Name'] = referral_data['First Name/Nickname'] + ' ' + referral_data['Surname']
+        
         referral_counts = referral_data.groupby('Who Referred You? (if any)').agg({
-            'Full Name': ['count', lambda x: ', '.join(x)]
+            'Full Name': ['count', lambda x: ', '.join(x)],
+            'Status': 'first'  # Add Status to the aggregation
         }).reset_index()
-        referral_counts.columns = ['Referee', 'Count', 'Referred By','Status']
+        
+        referral_counts.columns = ['Referee', 'Count', 'Referred By', 'Status']
+        
         return render_template('referral_details.html', referral_counts=referral_counts)
+    
     return redirect(url_for('index'))
+
 
 
 if __name__ == '__main__':
