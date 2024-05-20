@@ -1,6 +1,6 @@
 import json
 import os
-import urllib.parse  # Import the parse module
+import urllib.parse
 from datetime import datetime
 
 import pandas as pd
@@ -67,7 +67,6 @@ def variant_detail(variant_name):
         return render_template('variant_detail.html', variant_data=variant_data, variant_name=variant_name)
     return redirect(url_for('index'))
 
-
 @app.route('/all_variants', methods=['GET'])
 def all_variants_detail():
     if 'file_path' in session:
@@ -116,8 +115,6 @@ def referral_details():
         return render_template('referral_details.html', referral_counts=referral_counts)
     
     return redirect(url_for('index'))
-
-
 
 if __name__ == '__main__':
     app.run(debug=True)
